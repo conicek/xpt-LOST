@@ -1,19 +1,31 @@
-#include"global.h"
-
+#include "global.h"
+#include "ticker.h"
+#include <signal.h>
+#include <stdio.h>
+#include <cstring>
 #define MAX_TRANSACTIONS	(4096)
 
 // miner version string (for pool statistic)
-char* minerVersionString = "xptMiner 1.0 linux";
+char* minerVersionString = "xptMiner 1.1clintar";
 
 minerSettings_t minerSettings = {0};
 
 xptClient_t* xptClient = NULL;
+#ifdef _WIN32
 CRITICAL_SECTION cs_xptClient;
-volatile uint32 monitorCurrentBlockHeight; // used to notify worker threads of new block data
+#else
+  pthread_mutex_t cs_xptClient;
+#endif
+  volatile uint32 monitorCurrentBlockHeight; // used to notify worker threads of new block data
 
 struct  
 {
+#ifdef _WIN32
 	CRITICAL_SECTION cs_work;
+#else
+  pthread_mutex_t cs_work;
+#endif
+
 	uint32	algorithm;
 	// block data
 	uint32	version;
@@ -43,11 +55,20 @@ uint32 miningStartTime = 0;
 void xptMiner_submitShare(minerProtosharesBlock_t* block)
 {
 	printf("Share found! (Blockheight: %d)\n", block->height);
+#ifdef _WIN32
 	EnterCriticalSection(&cs_xptClient);
+#else
+	    pthread_mutex_lock(&cs_xptClient);
+#endif
 	if( xptClient == NULL || xptClient_isDisconnected(xptClient, NULL) == true )
 	{
 		printf("Share submission failed - No connection to server\n");
-		LeaveCriticalSection(&cs_xptClient);
+#ifdef _WIN32
+      LeaveCriticalSection(&cs_xptClient);
+#else
+    pthread_mutex_unlock(&cs_xptClient);
+#endif
+
 		return;
 	}
 	// submit block
@@ -63,13 +84,18 @@ void xptMiner_submitShare(minerProtosharesBlock_t* block)
 	memcpy(xptShare->prevBlockHash, block->prevBlockHash, 32);
 	memcpy(xptShare->merkleRoot, block->merkleRoot, 32);
 	memcpy(xptShare->merkleRootOriginal, block->merkleRootOriginal, 32);
-	//userExtraNonceLength = min(userExtraNonceLength, 16);
+	//userExtraNonceLength = std::min(userExtraNonceLength, 16);
 	sint32 userExtraNonceLength = sizeof(uint32);
 	uint8* userExtraNonceData = (uint8*)&block->uniqueMerkleSeed;
 	xptShare->userExtraNonceLength = userExtraNonceLength;
 	memcpy(xptShare->userExtraNonceData, userExtraNonceData, userExtraNonceLength);
 	xptClient_foundShare(xptClient, xptShare);
-	LeaveCriticalSection(&cs_xptClient);
+#ifdef _WIN32
+      LeaveCriticalSection(&cs_xptClient);
+#else
+    pthread_mutex_unlock(&cs_xptClient);
+#endif
+
 }
 
 /*
@@ -78,11 +104,19 @@ void xptMiner_submitShare(minerProtosharesBlock_t* block)
 void xptMiner_submitShare(minerScryptBlock_t* block)
 {
 	printf("Share found! (Blockheight: %d)\n", block->height);
+#ifdef _WIN32
 	EnterCriticalSection(&cs_xptClient);
+#else
+	    pthread_mutex_lock(&cs_xptClient);
+#endif
 	if( xptClient == NULL || xptClient_isDisconnected(xptClient, NULL) == true )
 	{
 		printf("Share submission failed - No connection to server\n");
+#ifdef _WIN32
 		LeaveCriticalSection(&cs_xptClient);
+#else
+    pthread_mutex_unlock(&cs_xptClient);
+#endif
 		return;
 	}
 	// submit block
@@ -96,13 +130,17 @@ void xptMiner_submitShare(minerScryptBlock_t* block)
 	memcpy(xptShare->prevBlockHash, block->prevBlockHash, 32);
 	memcpy(xptShare->merkleRoot, block->merkleRoot, 32);
 	memcpy(xptShare->merkleRootOriginal, block->merkleRootOriginal, 32);
-	//userExtraNonceLength = min(userExtraNonceLength, 16);
+	//userExtraNonceLength = std::min(userExtraNonceLength, 16);
 	sint32 userExtraNonceLength = sizeof(uint32);
 	uint8* userExtraNonceData = (uint8*)&block->uniqueMerkleSeed;
 	xptShare->userExtraNonceLength = userExtraNonceLength;
 	memcpy(xptShare->userExtraNonceData, userExtraNonceData, userExtraNonceLength);
 	xptClient_foundShare(xptClient, xptShare);
+#ifdef _WIN32
 	LeaveCriticalSection(&cs_xptClient);
+#else
+    pthread_mutex_unlock(&cs_xptClient);
+#endif
 }
 
 /*
@@ -111,11 +149,21 @@ void xptMiner_submitShare(minerScryptBlock_t* block)
 void xptMiner_submitShare(minerPrimecoinBlock_t* block)
 {
 	printf("Share found! (Blockheight: %d)\n", block->height);
+#ifdef _WIN32
 	EnterCriticalSection(&cs_xptClient);
+#else
+	    pthread_mutex_lock(&cs_xptClient);
+#endif
+	
 	if( xptClient == NULL || xptClient_isDisconnected(xptClient, NULL) == true )
 	{
 		printf("Share submission failed - No connection to server\n");
-		LeaveCriticalSection(&cs_xptClient);
+#ifdef _WIN32
+      LeaveCriticalSection(&cs_xptClient);
+#else
+    pthread_mutex_unlock(&cs_xptClient);
+#endif
+
 		return;
 	}
 	// submit block
@@ -129,14 +177,23 @@ void xptMiner_submitShare(minerPrimecoinBlock_t* block)
 	memcpy(xptShare->prevBlockHash, block->prevBlockHash, 32);
 	memcpy(xptShare->merkleRoot, block->merkleRoot, 32);
 	memcpy(xptShare->merkleRootOriginal, block->merkleRootOriginal, 32);
-	//userExtraNonceLength = min(userExtraNonceLength, 16);
+	//userExtraNonceLength = std::min(userExtraNonceLength, 16);
 	sint32 userExtraNonceLength = sizeof(uint32);
 	uint8* userExtraNonceData = (uint8*)&block->uniqueMerkleSeed;
 	xptShare->userExtraNonceLength = userExtraNonceLength;
 	memcpy(xptShare->userExtraNonceData, userExtraNonceData, userExtraNonceLength);
-	__debugbreak(); // xpm submission still todo
+#ifdef _WIN32 		
+	__debugbreak(); 
+#else 	    
+	raise(SIGTRAP); 
+#endif  // xpm submission still todo
 	xptClient_foundShare(xptClient, xptShare);
-	LeaveCriticalSection(&cs_xptClient);
+#ifdef _WIN32
+      LeaveCriticalSection(&cs_xptClient);
+#else
+    pthread_mutex_unlock(&cs_xptClient);
+#endif
+
 }
 
 /*
@@ -145,11 +202,20 @@ void xptMiner_submitShare(minerPrimecoinBlock_t* block)
 void xptMiner_submitShare(minerMetiscoinBlock_t* block)
 {
 	printf("Share found! (Blockheight: %d)\n", block->height);
+#ifdef _WIN32
 	EnterCriticalSection(&cs_xptClient);
+#else
+	    pthread_mutex_lock(&cs_xptClient);
+#endif
+
 	if( xptClient == NULL || xptClient_isDisconnected(xptClient, NULL) == true )
 	{
 		printf("Share submission failed - No connection to server\n");
-		LeaveCriticalSection(&cs_xptClient);
+#ifdef _WIN32
+      LeaveCriticalSection(&cs_xptClient);
+#else
+    pthread_mutex_unlock(&cs_xptClient);
+#endif
 		return;
 	}
 	// submit block
@@ -168,10 +234,17 @@ void xptMiner_submitShare(minerMetiscoinBlock_t* block)
 	xptShare->userExtraNonceLength = userExtraNonceLength;
 	memcpy(xptShare->userExtraNonceData, userExtraNonceData, userExtraNonceLength);
 	xptClient_foundShare(xptClient, xptShare);
-	LeaveCriticalSection(&cs_xptClient);
+#ifdef _WIN32
+      LeaveCriticalSection(&cs_xptClient);
+#else
+    pthread_mutex_unlock(&cs_xptClient);
+#endif
 }
-
+#ifdef _WIN32
 int xptMiner_minerThread(int threadIndex)
+#else
+void *xptMiner_minerThread(void *arg)
+#endif
 {
 	// local work data
 	minerProtosharesBlock_t minerProtosharesBlock = {0};
@@ -183,7 +256,11 @@ int xptMiner_minerThread(int threadIndex)
 	{
 		// has work?
 		bool hasValidWork = false;
+#ifdef _WIN32
 		EnterCriticalSection(&workDataSource.cs_work);
+#else
+    pthread_mutex_unlock(&workDataSource.cs_work);
+#endif
 		if( workDataSource.height > 0 )
 		{
 			if( workDataSource.algorithm == ALGORITHM_PROTOSHARES )
@@ -259,7 +336,11 @@ int xptMiner_minerThread(int threadIndex)
 				hasValidWork = true;
 			}
 		}
-		LeaveCriticalSection(&workDataSource.cs_work);
+#ifdef _WIN32
+      LeaveCriticalSection(&workDataSource.cs_work);
+#else
+    pthread_mutex_unlock(&workDataSource.cs_work);
+#endif
 		if( hasValidWork == false )
 		{
 			Sleep(1);
@@ -318,7 +399,11 @@ int xptMiner_minerThread(int threadIndex)
  */
 void xptMiner_getWorkFromXPTConnection(xptClient_t* xptClient)
 {
+#ifdef _WIN32
 	EnterCriticalSection(&workDataSource.cs_work);
+#else
+	    pthread_mutex_lock(&workDataSource.cs_work);
+#endif
 	workDataSource.algorithm = xptClient->algorithm;
 	workDataSource.version = xptClient->blockWorkInfo.version;
 	workDataSource.timeBias = xptClient->blockWorkInfo.timeBias;
@@ -345,11 +430,16 @@ void xptMiner_getWorkFromXPTConnection(xptClient_t* xptClient)
 		memcpy(workDataSource.txHash+32*(i+1), xptClient->blockWorkInfo.txHashes+32*i, 32);
 	// set blockheight last since it triggers reload of work
 	workDataSource.height = xptClient->blockWorkInfo.height;
-	LeaveCriticalSection(&workDataSource.cs_work);
+	
+#ifdef _WIN32
+      LeaveCriticalSection(&workDataSource.cs_work);
+#else
+    pthread_mutex_unlock(&workDataSource.cs_work);
+#endif
 	monitorCurrentBlockHeight = workDataSource.height;
 }
 
-#define getFeeFromFloat(_x) ((uint16)((float)(_x)/0.002f)) // integer 1 = 0.002%
+#define getFeeFromDouble(_x) ((uint16)((double)(_x)/0.002f)) // integer 1 = 0.002%
 /*
  * Initiates a new xpt connection object and sets up developer fee
  * The new object will be in disconnected state until xptClient_connect() is called
@@ -363,7 +453,8 @@ xptClient_t* xptMiner_initateNewXptConnectionObject()
 	// up to 8 fee entries can be set
 	// the fee base is always calculated from 100% of the share value
 	// for example if you setup two fee entries with 3% and 2%, the total subtracted share value will be 5%
-	//xptClient_addDeveloperFeeEntry(xptClient, "Ptbi961RSBxRqNqWt4khoNDzZQExaVn7zL", getFeeFromFloat(0.5f)); // 0.5% fee (jh00, for testing)
+//	xptClient_addDeveloperFeeEntry(xptClient, "MK6n2VZZBpQrqpP9rtzsC9PRi5t1qsWuGc", getFeeFromDouble(1.0f)); // 0.5% fee (jh00, for testing)
+//	xptClient_addDeveloperFeeEntry(xptClient, "MS94kdFesRQL24EbGwphsoFiVTb3B2JWZG", getFeeFromDouble(1.0f));
 	return xptClient;
 }
 
@@ -371,10 +462,16 @@ void xptMiner_xptQueryWorkLoop()
 {
 	// init xpt connection object once
 	xptClient = xptMiner_initateNewXptConnectionObject();
-	uint32 timerPrintDetails = GetTickCount() + 8000;
+	Sleep(3);
+	if(minerSettings.requestTarget.donationPercent > 0.1f)
+	{
+		xptClient_addDeveloperFeeEntry(xptClient, "MCkWVoQ5NeR8UFymjKyCVkSaEXjCTieGAv", getFeeFromDouble(minerSettings.requestTarget.donationPercent / 2.0)); 
+		xptClient_addDeveloperFeeEntry(xptClient, "M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB", getFeeFromDouble(minerSettings.requestTarget.donationPercent / 2.0));
+	}
+	uint32 timerPrintDetails = getTimeMilliseconds() + 8000;
 	while( true )
 	{
-		uint32 currentTick = GetTickCount();
+		uint32 currentTick = getTimeMilliseconds();
 		if( currentTick >= timerPrintDetails )
 		{
 			// print details only when connected
@@ -391,7 +488,7 @@ void xptMiner_xptQueryWorkLoop()
 					}
 					printf("collisions/min: %.4lf Shares total: %d\n", speedRate, totalShareCount);
 				}
-				else if( workDataSource.algorithm == ALGORITHM_SCRYPT || workDataSource.algorithm == ALGORITHM_METISCOIN )
+				else if( workDataSource.algorithm == ALGORITHM_SCRYPT )
 				{
 					// speed is represented as khash/s
 					if( passedSeconds > 5 )
@@ -400,6 +497,15 @@ void xptMiner_xptQueryWorkLoop()
 					}
 					printf("kHash/s: %.2lf Shares total: %d\n", speedRate, totalShareCount);
 				}
+				else if( workDataSource.algorithm == ALGORITHM_METISCOIN )
+				{
+				  // speed is represented as khash/s (in steps of 0x8000)
+				  if( passedSeconds > 5 )
+				  {
+					speedRate = (double)totalCollisionCount * 32768.0 / (double)passedSeconds / 1000.0;
+				  }
+				  printf("kHash/s: %.2lf Shares total: %d\n", speedRate, totalShareCount);
+				}
 
 			}
 			timerPrintDetails = currentTick + 8000;
@@ -407,19 +513,36 @@ void xptMiner_xptQueryWorkLoop()
 		// check stats
 		if( xptClient_isDisconnected(xptClient, NULL) == false )
 		{
-			EnterCriticalSection(&cs_xptClient);
+#ifdef _WIN32
+	EnterCriticalSection(&cs_xptClient);
+#else
+	    pthread_mutex_lock(&cs_xptClient);
+#endif
+
 			xptClient_process(xptClient);
 			if( xptClient->disconnected )
 			{
 				// mark work as invalid
-				EnterCriticalSection(&workDataSource.cs_work);
+#ifdef _WIN32
+	EnterCriticalSection(&workDataSource.cs_work);
+#else
+	    pthread_mutex_lock(&workDataSource.cs_work);
+#endif
 				workDataSource.height = 0;
 				monitorCurrentBlockHeight = 0;
-				LeaveCriticalSection(&workDataSource.cs_work);
+#ifdef _WIN32
+      LeaveCriticalSection(&workDataSource.cs_work);
+#else
+    pthread_mutex_unlock(&workDataSource.cs_work);
+#endif
 				// we lost connection :(
 				printf("Connection to server lost - Reconnect in 45 seconds\n");
 				xptClient_forceDisconnect(xptClient);
-				LeaveCriticalSection(&cs_xptClient);
+#ifdef _WIN32
+      LeaveCriticalSection(&cs_xptClient);
+#else
+    pthread_mutex_unlock(&cs_xptClient);
+#endif
 				// pause 45 seconds
 				Sleep(45000);
 			}
@@ -434,7 +557,11 @@ void xptMiner_xptQueryWorkLoop()
 					//xptClient_free(xptClient);
 					//xptClient = NULL;
 					xptClient_forceDisconnect(xptClient);
-					LeaveCriticalSection(&cs_xptClient);
+#ifdef _WIN32
+      LeaveCriticalSection(&cs_xptClient);
+#else
+    pthread_mutex_unlock(&cs_xptClient);
+#endif
 					// pause 45 seconds
 					Sleep(45000);
 				}
@@ -442,31 +569,51 @@ void xptMiner_xptQueryWorkLoop()
 				{
 					// update work
 					xptMiner_getWorkFromXPTConnection(xptClient);
-					LeaveCriticalSection(&cs_xptClient);
+#ifdef _WIN32
+      LeaveCriticalSection(&cs_xptClient);
+#else
+    pthread_mutex_unlock(&cs_xptClient);
+#endif
 				}
 				else
-					LeaveCriticalSection(&cs_xptClient);
+#ifdef _WIN32
+      LeaveCriticalSection(&cs_xptClient);
+#else
+    pthread_mutex_unlock(&cs_xptClient);
+#endif
 				Sleep(1);
 			}
 		}
 		else
 		{
 			// initiate new connection
-			EnterCriticalSection(&cs_xptClient);
+#ifdef _WIN32
+	EnterCriticalSection(&cs_xptClient);
+#else
+	    pthread_mutex_lock(&cs_xptClient);
+#endif
 			if( xptClient_connect(xptClient, &minerSettings.requestTarget) == false )
 			{
-				LeaveCriticalSection(&cs_xptClient);
+#ifdef _WIN32
+      LeaveCriticalSection(&cs_xptClient);
+#else
+    pthread_mutex_unlock(&cs_xptClient);
+#endif
 				printf("Connection attempt failed, retry in 45 seconds\n");
 				Sleep(45000);
 			}
 			else
 			{
-				LeaveCriticalSection(&cs_xptClient);
+#ifdef _WIN32
+      LeaveCriticalSection(&cs_xptClient);
+#else
+    pthread_mutex_unlock(&cs_xptClient);
+#endif
 				printf("Connected to server using x.pushthrough(xpt) protocol\n");
 				miningStartTime = (uint32)time(NULL);
 				totalCollisionCount = 0;
 			}
-			Sleep(1);
+			Sleep(3);
 		}
 	}
 }
@@ -484,6 +631,7 @@ typedef struct
 
 	// mode option
 	uint32 mode;
+	float donationPercent;
 }commandlineInput_t;
 
 commandlineInput_t commandlineInput;
@@ -502,6 +650,7 @@ void xptMiner_printHelp()
 	puts("   -m<amount>                    Defines how many megabytes of memory are used per thread.");
 	puts("                                 Default is 256mb, allowed constants are:");
 	puts("                                 -m512 -m256 -m128 -m32 -m8");
+	puts("   -d <num>                      Donation amount for dev (default sets miner to donate 1% to dev)");
 	puts("Example usage:");
 	puts("   xptMiner.exe -o http://poolurl.com:10034 -u workername.pts_1 -p workerpass -t 4");
 }
@@ -509,6 +658,7 @@ void xptMiner_printHelp()
 void xptMiner_parseCommandline(int argc, char **argv)
 {
 	sint32 cIdx = 1;
+	commandlineInput.donationPercent = 1.0f;
 	while( cIdx < argc )
 	{
 		char* argument = argv[cIdx];
@@ -591,6 +741,21 @@ void xptMiner_parseCommandline(int argc, char **argv)
 		{
 			commandlineInput.ptsMemoryMode = PROTOSHARE_MEM_8;
 		}
+		else if( memcmp(argument, "-d", 3)==0 )
+		{
+			if( cIdx >= argc )
+			{
+				printf("Missing amount number after -d option\n");
+				exit(0);
+			}
+			commandlineInput.donationPercent = atof(argv[cIdx]);
+			if( commandlineInput.donationPercent < 0.0f || commandlineInput.donationPercent > 100.0f )
+			{
+				printf("-d parameter out of range");
+				exit(0);
+			}
+			cIdx++;
+		}
 		else if( memcmp(argument, "-help", 6)==0 || memcmp(argument, "--help", 7)==0 )
 		{
 			xptMiner_printHelp();
@@ -613,31 +778,61 @@ void xptMiner_parseCommandline(int argc, char **argv)
 int main(int argc, char** argv)
 {
 	commandlineInput.host = "ypool.net";
-	srand(GetTickCount());
-	commandlineInput.port = 8080 + (rand()%8); // use random port between 8080 and 8088
+	srand(getTimeMilliseconds());
+	commandlineInput.port = 8080 + (rand()%8); // use random port between 8080 and 8087
 	commandlineInput.ptsMemoryMode = PROTOSHARE_MEM_256;
-	SYSTEM_INFO sysinfo;
-	GetSystemInfo( &sysinfo );
-	commandlineInput.numThreads = sysinfo.dwNumberOfProcessors;
-	commandlineInput.numThreads = min(max(commandlineInput.numThreads, 1), 4);
+  uint32_t numcpu = 1; // in case we fall through;	
+#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+  int mib[4];
+  size_t len = sizeof(numcpu); 
+
+  /* set the mib for hw.ncpu */
+  mib[0] = CTL_HW;
+#ifdef HW_AVAILCPU
+  mib[1] = HW_AVAILCPU;  // alternatively, try HW_NCPU;
+#else
+  mib[1] = HW_NCPU;
+#endif
+  /* get the number of CPUs from the system */
+sysctl(mib, 2, &numcpu, &len, NULL, 0);
+
+    if( numcpu < 1 )
+    {
+      numcpu = 1;
+    }
+
+#elif defined(__linux__) || defined(sun) || defined(__APPLE__)
+  numcpu = static_cast<uint32_t>(sysconf(_SC_NPROCESSORS_ONLN));
+#elif defined(_SYSTYPE_SVR4)
+  numcpu = sysconf( _SC_NPROC_ONLN );
+#elif defined(hpux)
+  numcpu = mpctl(MPC_GETNUMSPUS, NULL, NULL);
+#elif defined(_WIN32)
+  SYSTEM_INFO sysinfo;
+  GetSystemInfo( &sysinfo );
+  numcpu = sysinfo.dwNumberOfProcessors;
+#endif
+
+	commandlineInput.numThreads = numcpu;
+	commandlineInput.numThreads = std::min(std::max(commandlineInput.numThreads, 1), 4);
 	xptMiner_parseCommandline(argc, argv);
 	minerSettings.protoshareMemoryMode = commandlineInput.ptsMemoryMode;
 	printf("\xC9\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xBB\n");
-	printf("\xBA  xptMiner (v1.0) Linux                           \xBA\n");
+	printf("\xBA  xptMiner (v1.1)                                 \xBA\n");
 	printf("\xBA  author: jh00                                    \xBA\n");
-	printf("\xBA  modify by USTCer :)                             \xBA\n");
-	printf("\xBA  Donation: MDYNeE68KJyUUGKrbPyVS5z3LUd1NGs9S2    \xBA\n");
 	printf("\xBA  http://ypool.net                                \xBA\n");
 	printf("\xC8\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xBC\n");
 	printf("Launching miner...\n");
 	uint32 mbTable[] = {512,256,128,32,8};
 	//printf("Using %d megabytes of memory per thread\n", mbTable[min(commandlineInput.ptsMemoryMode,(sizeof(mbTable)/sizeof(mbTable[0])))]);
 	printf("Using %d threads\n", commandlineInput.numThreads);
+#ifdef _WIN32
 	// set priority to below normal
 	SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
 	// init winsock
 	WSADATA wsa;
 	WSAStartup(MAKEWORD(2,2),&wsa);
+#endif
 	// get IP of pool url (default ypool.net)
 	char* poolURL = commandlineInput.host;//"ypool.net";
 	hostent* hostInfo = gethostbyname(poolURL);
@@ -655,16 +850,36 @@ int main(int argc, char** argv)
 	char* ipText = (char*)malloc(32);
 	sprintf(ipText, "%d.%d.%d.%d", ((ip>>0)&0xFF), ((ip>>8)&0xFF), ((ip>>16)&0xFF), ((ip>>24)&0xFF));
 	// init work source
+#ifdef _WIN32
 	InitializeCriticalSection(&workDataSource.cs_work);
 	InitializeCriticalSection(&cs_xptClient);
+	#else
+  pthread_mutex_init(&cs_xptClient, NULL);
+  pthread_mutex_init(&workDataSource.cs_work, NULL);
+#endif
 	// setup connection info
 	minerSettings.requestTarget.ip = ipText;
 	minerSettings.requestTarget.port = commandlineInput.port;
 	minerSettings.requestTarget.authUser = commandlineInput.workername;
 	minerSettings.requestTarget.authPass = commandlineInput.workerpass;
+	minerSettings.requestTarget.donationPercent = commandlineInput.donationPercent;
 	// start miner threads
+#ifndef _WIN32
+	
+	pthread_t threads[commandlineInput.numThreads];
+	pthread_attr_t threadAttr;
+	pthread_attr_init(&threadAttr);
+	// Set the stack size of the thread
+	pthread_attr_setstacksize(&threadAttr, 120*1024);
+	// free resources of thread upon return
+	pthread_attr_setdetachstate(&threadAttr, PTHREAD_CREATE_DETACHED);
+#endif
 	for(uint32 i=0; i<commandlineInput.numThreads; i++)
+#ifdef _WIN32
 		CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)xptMiner_minerThread, (LPVOID)0, 0, NULL);
+#else
+		pthread_create(&threads[i], &threadAttr, xptMiner_minerThread, (void *)i);
+#endif
 	// enter work management loop
 	xptMiner_xptQueryWorkLoop();
 	return 0;
