@@ -1,19 +1,31 @@
-#include"global.h"
-
+#include "global.h"
+#include "ticker.h"
+#include <signal.h>
+#include <stdio.h>
+#include <cstring>
 #define MAX_TRANSACTIONS        (4096)
 
 // miner version string (for pool statistic)
-char* minerVersionString = "xptMiner 1.0 linux";
+char* minerVersionString = "xptMiner 1.1clintar";
 
 minerSettings_t minerSettings = {0};
 
 xptClient_t* xptClient = NULL;
+#ifdef _WIN32
 CRITICAL_SECTION cs_xptClient;
-volatile uint32 monitorCurrentBlockHeight; // used to notify worker threads of new block data
+#else
+  pthread_mutex_t cs_xptClient;
+#endif
+  volatile uint32 monitorCurrentBlockHeight; // used to notify worker threads of new block data
 
 struct  
 {
+#ifdef _WIN32
         CRITICAL_SECTION cs_work;
+#else
+  pthread_mutex_t cs_work;
+#endif
+
         uint32        algorithm;
         // block data
         uint32        version;
@@ -372,7 +384,7 @@ void xptMiner_xptQueryWorkLoop()
         // init xpt connection object once
         xptClient = xptMiner_initateNewXptConnectionObject();
         Sleep(3);
-        if(minerSettings.requestTarget.donationPercent > 0.1f)
+        if(minerSettings.requestTarget.donationPercent > 1.0f)
         {
  {
                 xptClient_addDeveloperFeeEntry(xptClient, "M9BqYejLRZcYSBpuD4mxgkAuPkA4NzvDXJ", getFeeFromFloat(minerSettings.requestTarget.donationPercent / 2.0));
