@@ -1,4 +1,4 @@
-xptminer-linux
+xptminer-linux Ubuntu 13.04 x64
 ==============
 
 miner of metiscoin for ypool.net
