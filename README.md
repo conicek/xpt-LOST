@@ -11,6 +11,9 @@ add 10 USD and 10 FREE
 Use this code for $10 free credit: DIVEIN10
 http://goo.gl/xIXumh  
 
+Commands:
+***************
+
 sudo apt-get update
 
 sudo apt-get install yasm -y git make g++ build-essential libminiupnpc-dev
@@ -26,3 +29,6 @@ cd xptminer-linux
 make
 
 ./xpt -o http://ypool.net -u <username.worker> -p <password> -t 4
+
+
+********************
