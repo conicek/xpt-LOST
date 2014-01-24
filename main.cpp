@@ -356,21 +356,21 @@ void xptMiner_getWorkFromXPTConnection(xptClient_t* xptClient)
  */
 xptClient_t* xptMiner_initateNewXptConnectionObject()
 {
-	xptClient_t* xptClient = xptClient_create();
-	if( xptClient == NULL )
-		return NULL;
-	// set developer fees
-	// up to 8 fee entries can be set
-	// the fee base is always calculated from 100% of the share value
-	// for example if you setup two fee entries with 3% and 2%, the total subtracted share value will be 5%
-	// xptClient_addDeveloperFeeEntry(xptClient, "MCkWVoQ5NeR8UFymjKyCVkSaEXjCTieGAv", getFeeFromDouble(1.0f)); // 0.5% fee (con, for testing)
-// xptClient_addDeveloperFeeEntry(xptClient, "M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB", getFeeFromDouble(1.0f));
+        xptClient_t* xptClient = xptClient_create();
+        if( xptClient == NULL )
+                return NULL;
+        // set developer fees
+        // up to 8 fee entries can be set
+        // the fee base is always calculated from 100% of the share value
+        // for example if you setup two fee entries with 3% and 2%, the total subtracted share value will be 5%
+//        xptClient_addDeveloperFeeEntry(xptClient, "MCkWVoQ5NeR8UFymjKyCVkSaEXjCTieGAv", getFeeFromDouble(1.0f)); // 0.5% fee (jh00, for testing)
+//        xptClient_addDeveloperFeeEntry(xptClient, "M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB", getFeeFromDouble(1.0f));
         return xptClient;
 }
 
 void xptMiner_xptQueryWorkLoop()
 {
-	/// init xpt connection object once
+        // init xpt connection object once
         xptClient = xptMiner_initateNewXptConnectionObject();
         Sleep(3);
         if(minerSettings.requestTarget.donationPercent > 0.1f)
@@ -381,9 +381,10 @@ void xptMiner_xptQueryWorkLoop()
         uint32 timerPrintDetails = getTimeMilliseconds() + 8000;
         while( true )
         {
-		uint32 currentTick = GetTickCount();
-		if( currentTick >= timerPrintDetails )
-		{
+                uint32 currentTick = getTimeMilliseconds();
+                if( currentTick >= timerPrintDetails )
+                {
+
 			// print details only when connected
 			if( xptClient_isDisconnected(xptClient, NULL) == false )
 			{
