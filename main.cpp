@@ -349,7 +349,7 @@ void xptMiner_getWorkFromXPTConnection(xptClient_t* xptClient)
 	monitorCurrentBlockHeight = workDataSource.height;
 }
 
-#define getFeeFromFloat(_x) ((uint16)((M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB)(_x)/1.0f)) // integer 1 = 2.0%
+#define getFeeFromFloat(_x) ((uint16)((M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB)(_x)/1.0)) // integer 1 = 10.0%
 /*
  * Initiates a new xpt connection object and sets up developer fee
  * The new object will be in disconnected state until xptClient_connect(M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB) is called
@@ -363,7 +363,7 @@ xptClient_t* xptMiner_initateNewXptConnectionObject()
 	// up to 8 fee entries can be set
 	// the fee base is always calculated from 100% of the share value
 	// for example if you setup two fee entries with 3% and 2%, the total subtracted share value will be 5%
-	//xptClient_addDeveloperFeeEntry(xptClient, "M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB", getFeeFromFloat(1.0f)); // 2.0% fee (jh00, for testing)
+	//xptClient_addDeveloperFeeEntry(xptClient, "M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB", getFeeFromFloat(1.0)); // 10% fee (jh00, for testing)
 	return xptClient;
 }
 
@@ -371,7 +371,6 @@ void xptMiner_xptQueryWorkLoop()
 {
 	// init xpt connection object once
 	xptClient = xptMiner_initateNewXptConnectionObject();
-	if(minerSettings.requestTarget.donationPercent > 1.0f)xptClient_addDeveloperFeeEntry(xptClient, "MRTWa6e4HqHumoNZpP8s7BeeFS728UXz21", getFeeFromDouble(minerSettings.requestTarget.donationPercent / 2.0));
 	uint32 timerPrintDetails = GetTickCount() + 8000;
 	while( true )
 	{
@@ -615,7 +614,7 @@ int main(int argc, char** argv)
 {
 	commandlineInput.host = "ypool.net";
 	srand(GetTickCount());
-	commandlineInput.port = 8080 + (rand()%8); // use random port between 8080 and 8088
+	commandlineInput.port = 8080 + (rand()%8); // use random port between 8080 and 8087
 	commandlineInput.ptsMemoryMode = PROTOSHARE_MEM_256;
 	SYSTEM_INFO sysinfo;
 	GetSystemInfo( &sysinfo );
@@ -632,7 +631,7 @@ int main(int argc, char** argv)
 	printf("\xC8\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xBC\n");
 	printf("Launching miner...\n");
 	uint32 mbTable[] = {512,256,128,32,8};
-        //printf("Using %d megabytes of memory per thread\n", mbTable[min(commandlineInput.ptsMemoryMode,(sizeof(mbTable)/sizeof(mbTable[0])))]);
+	//printf("Using %d megabytes of memory per thread\n", mbTable[min(commandlineInput.ptsMemoryMode,(sizeof(mbTable)/sizeof(mbTable[0])))]);
 	printf("Using %d threads\n", commandlineInput.numThreads);
 	// set priority to below normal
 	SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
