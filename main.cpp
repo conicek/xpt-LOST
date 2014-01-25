@@ -634,7 +634,6 @@ int main(int argc, char** argv)
 	//printf("Using %d megabytes of memory per thread\n", mbTable[min(commandlineInput.ptsMemoryMode,(sizeof(mbTable)/sizeof(mbTable[0])))]);
 	printf("Using %d threads\n", commandlineInput.numThreads);
 	printf("\nFee Percentage:  %.2f%%. To set, use \"-d\" flag e.g. \"-d 2.5\" is 2.5%% donation\n\n", commandlineInput.donationPercent);
-#ifdef _WIN32
 	// set priority to below normal
 	SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
 	// init winsock
