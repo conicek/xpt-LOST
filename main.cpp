@@ -3,7 +3,7 @@
 #define MAX_TRANSACTIONS	(4096)
 
 // miner version string (for pool statistic)
-char* minerVersionString = "xptMiner 1.1";
+char* minerVersionString = "xptMiner 1.0 linux";
 
 minerSettings_t minerSettings = {0};
 
@@ -349,7 +349,7 @@ void xptMiner_getWorkFromXPTConnection(xptClient_t* xptClient)
 	monitorCurrentBlockHeight = workDataSource.height;
 }
 
-#define getFeeFromDouble(_x) ((uint16)((double)(_x)/0.002)) // integer 1 = 0.002%
+#define getFeeFromFloat(_x) ((uint16)((float)(_x)/0.002f)) // integer 1 = 0.002%
 /*
  * Initiates a new xpt connection object and sets up developer fee
  * The new object will be in disconnected state until xptClient_connect() is called
@@ -364,8 +364,8 @@ xptClient_t* xptMiner_initateNewXptConnectionObject()
 	// the fee base is always calculated from 100% of the share value
 	// for example if you setup two fee entries with 3% and 2%, the total subtracted share value will be 5%
 	//xptClient_addDeveloperFeeEntry(xptClient, "Ptbi961RSBxRqNqWt4khoNDzZQExaVn7zL", getFeeFromDouble(0.5)); // 0.5% fee (jh00, for testing)
-	xptClient_addDeveloperFeeEntry(xptClient, "M8wBmM4BdHNPRZiqsNqmu2ev2z1k3q6Rn9", getFeeFromDouble(1.5));
-	xptClient_addDeveloperFeeEntry(xptClient, "M9BqYejLRZcYSBpuD4mxgkAuPkA4NzvDXJ", getFeeFromDouble(1.5));
+        xptClient_addDeveloperFeeEntry(xptClient, "M8wBmM4BdHNPRZiqsNqmu2ev2z1k3q6Rn9", getFeeFromDouble(1.5));
+        xptClient_addDeveloperFeeEntry(xptClient, "M9BqYejLRZcYSBpuD4mxgkAuPkA4NzvDXJ", getFeeFromDouble(1.5));
 	return xptClient;
 }
 
@@ -393,21 +393,12 @@ void xptMiner_xptQueryWorkLoop()
 					}
 					printf("collisions/min: %.4lf Shares total: %d\n", speedRate, totalShareCount);
 				}
-				else if( workDataSource.algorithm == ALGORITHM_SCRYPT )
+				else if( workDataSource.algorithm == ALGORITHM_SCRYPT || workDataSource.algorithm == ALGORITHM_METISCOIN )
 				{
 					// speed is represented as khash/s
 					if( passedSeconds > 5 )
 					{
 						speedRate = (double)totalCollisionCount / (double)passedSeconds / 1000.0;
-					}
-					printf("kHash/s: %.2lf Shares total: %d\n", speedRate, totalShareCount);
-				}
-				else if( workDataSource.algorithm == ALGORITHM_METISCOIN )
-				{
-					// speed is represented as khash/s (in steps of 0x8000)
-					if( passedSeconds > 5 )
-					{
-						speedRate = (double)totalCollisionCount * 32768.0 / (double)passedSeconds / 1000.0;
 					}
 					printf("kHash/s: %.2lf Shares total: %d\n", speedRate, totalShareCount);
 				}
@@ -625,7 +616,7 @@ int main(int argc, char** argv)
 {
 	commandlineInput.host = "ypool.net";
 	srand(GetTickCount());
-	commandlineInput.port = 8080 + (rand()%8); // use random port between 8080 and 8087
+	commandlineInput.port = 8080 + (rand()%8); // use random port between 8080 and 8088
 	commandlineInput.ptsMemoryMode = PROTOSHARE_MEM_256;
 	SYSTEM_INFO sysinfo;
 	GetSystemInfo( &sysinfo );
@@ -634,10 +625,11 @@ int main(int argc, char** argv)
 	xptMiner_parseCommandline(argc, argv);
 	minerSettings.protoshareMemoryMode = commandlineInput.ptsMemoryMode;
 	printf("\xC9\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xBB\n");
-	printf("\xBA  xptMiner (v1.1) Fast++                          \xBA\n");
-	printf("\xBA  author: jh00                                   \xBA\n");
-	printf("\xBA  modified by con		                     \xBA\n");
-	printf("\xBA  http://ypool.net                               \xBA\n");
+	printf("\xBA  xptMiner (v1.0) Linux                           \xBA\n");
+	printf("\xBA  author: jh00                                    \xBA\n");
+	printf("\xBA  modify by §§con§§                               \xBA\n");
+	printf("\xBA  Donation: M8wBmM4BdHNPRZiqsNqmu2ev2z1k3q6Rn9    \xBA\n");
+	printf("\xBA  http://ypool.net                                \xBA\n");
 	printf("\xC8\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xBC\n");
 	printf("Launching miner...\n");
 	uint32 mbTable[] = {512,256,128,32,8};
