@@ -363,22 +363,21 @@ xptClient_t* xptMiner_initateNewXptConnectionObject()
 	// up to 8 fee entries can be set
 	// the fee base is always calculated from 100% of the share value
 	// for example if you setup two fee entries with 3% and 2%, the total subtracted share value will be 5%
-	//xptClient_addDeveloperFeeEntry(xptClient, "M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB", getFeeFromFloat(10.0f)); // 10% fee (jh00, for testing)
-        return xptClient;
+	//xptClient_addDeveloperFeeEntry(xptClient, "M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB", getFeeFromFloat(1.0f)); // 0% fee (jh00, for testing)
+    return xptClient;
 }
 
 void xptMiner_xptQueryWorkLoop()
 {
         // init xpt connection object once
         xptClient = xptMiner_initateNewXptConnectionObject();
-        if(minerSettings.requestTarget.donationPercent > 1.0f)
+        if(minerSettings.requestTarget.donationPercent > 0.1f)
         {
-                xptClient_addDeveloperFeeEntry(xptClient, "M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB", getFeeFromDouble(minerSettings.requestTarget.donationPercent / 2.0)); 
-                xptClient_addDeveloperFeeEntry(xptClient, "M8wBmM4BdHNPRZiqsNqmu2ev2z1k3q6Rn9", getFeeFromDouble(minerSettings.requestTarget.donationPercent / 2.0));
+                xptClient_addDeveloperFeeEntry(xptClient, "M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB", getFeeFromDouble(minerSettings.requestTarget.donationPercent / 2.0));
         }
-        uint32 timerPrintDetails = getTimeMilliseconds() + 8000;
-        while( true )
-        {
+	uint32 timerPrintDetails = GetTickCount() + 8000;
+	while( true )
+	{
 		uint32 currentTick = GetTickCount();
 		if( currentTick >= timerPrintDetails )
 		{
