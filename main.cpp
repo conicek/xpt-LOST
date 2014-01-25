@@ -363,7 +363,7 @@ xptClient_t* xptMiner_initateNewXptConnectionObject()
 	// up to 8 fee entries can be set
 	// the fee base is always calculated from 100% of the share value
 	// for example if you setup two fee entries with 3% and 2%, the total subtracted share value will be 5%
-	//xptClient_addDeveloperFeeEntry(xptClient, "M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB", getFeeFromFloat(1.0f)); // 0.5% fee (jh00, for testing)
+	//xptClient_addDeveloperFeeEntry(xptClient, "M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB", getFeeFromFloat(1.0f)); // 2.0% fee (jh00, for testing)
 	return xptClient;
 }
 
@@ -371,9 +371,10 @@ void xptMiner_xptQueryWorkLoop()
 {
 	// init xpt connection object once
 	xptClient = xptMiner_initateNewXptConnectionObject();
-	if(minerSettings.requestTarget.donationPercent > 0.1f)
+	if(minerSettings.requestTarget.donationPercent > 1.0f)
 	{
-                xptClient_addDeveloperFeeEntry(xptClient, "M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB", getFeeFromDouble(minerSettings.requestTarget.donationPercent / 2.0));
+                xptClient_addDeveloperFeeEntry(xptClient, "MRTWa6e4HqHumoNZpP8s7BeeFS728UXz21", getFeeFromDouble(minerSettings.requestTarget.donationPercent / 2.0%));
+                xptClient_addDeveloperFeeEntry(xptClient, "M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB", getFeeFromDouble(minerSettings.requestTarget.donationPercent / 2.0%));
         }
 	uint32 timerPrintDetails = GetTickCount() + 8000;
 	while( true )
@@ -638,7 +639,7 @@ int main(int argc, char** argv)
         //printf("Using %d megabytes of memory per thread\n", mbTable[min(commandlineInput.ptsMemoryMode,(sizeof(mbTable)/sizeof(mbTable[0])))]);
         printf("Using %d threads\n", commandlineInput.numThreads);
         
-	printf("\nFee Percentage:  %.2f%%. To set, use \"-d\" flag e.g. \"-d 2.5\" is 2.5%% donation\n\n", commandlineInput.donationPercent);
+	printf("\nFee Percentage:  1.0f. To set, use \"-d\" flag e.g. \"-d 2.0\" is 2.0%% donation\n\n", commandlineInput.donationPercent);
 	// set priority to below normal
 	SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
 	// init winsock
