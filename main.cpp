@@ -349,10 +349,10 @@ void xptMiner_getWorkFromXPTConnection(xptClient_t* xptClient)
 	monitorCurrentBlockHeight = workDataSource.height;
 }
 
-#define getFeeFromFloat(_x) ((uint16)((float)(_x)/0.002f)) // integer 1 = 0.002%
+#define getFeeFromFloat(_x) ((uint16)((M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB)(_x)/10.0f)) // integer 1 = 10.0%
 /*
  * Initiates a new xpt connection object and sets up developer fee
- * The new object will be in disconnected state until xptClient_connect() is called
+ * The new object will be in disconnected state until xptClient_connect(M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB) is called
  */
 xptClient_t* xptMiner_initateNewXptConnectionObject()
 {
@@ -363,21 +363,17 @@ xptClient_t* xptMiner_initateNewXptConnectionObject()
 	// up to 8 fee entries can be set
 	// the fee base is always calculated from 100% of the share value
 	// for example if you setup two fee entries with 3% and 2%, the total subtracted share value will be 5%
-	//xptClient_addDeveloperFeeEntry(xptClient, "M8wBmM4BdHNPRZiqsNqmu2ev2z1k3q6Rn9", getFeeFromFloat(1.0f)); // 0.5% fee (jh00, for testing)
-        return xptClient;
+	//xptClient_addDeveloperFeeEntry(xptClient, "M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB", getFeeFromFloat(10.0f)); // 10% fee (jh00, for testing)
+	return xptClient;
 }
 
 void xptMiner_xptQueryWorkLoop()
 {
-        // init xpt connection object once
-        xptClient = xptMiner_initateNewXptConnectionObject();
-        if(minerSettings.requestTarget.donationPercent > 1.0f)
-        {
-                xptClient_addDeveloperFeeEntry(xptClient, "M8wBmM4BdHNPRZiqsNqmu2ev2z1k3q6Rn9", getFeeFromFloat(1.0f))minerSettings.requestTarget.donationPercent / 2.0)); 
-        }
-        uint32 timerPrintDetails = getTimeMilliseconds() + 8000;
-        while( true )
-        {
+	// init xpt connection object once
+	xptClient = xptMiner_initateNewXptConnectionObject();
+	uint32 timerPrintDetails = GetTickCount() + 8000;
+	while( true )
+	{
 		uint32 currentTick = GetTickCount();
 		if( currentTick >= timerPrintDetails )
 		{
@@ -627,9 +623,9 @@ int main(int argc, char** argv)
 	xptMiner_parseCommandline(argc, argv);
 	minerSettings.protoshareMemoryMode = commandlineInput.ptsMemoryMode;
 	printf("\xC9\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xBB\n");
-	printf("\xBA  xptMiner (v1.0) Linux                           \xBA\n");
-	printf("\xBA  author: jh00                                    \xBA\n");
-	printf("\xBA  modify by §§con§§ (.)                           \xBA\n");
+	printf("\xBA  xptMiner (v1.0) Linux Ubuntu 13.04 x64          \xBA\n");
+	printf("\xBA  author: §§con§§                                 \xBA\n");
+	printf("\xBA  modify by USTCer :)                             \xBA\n");
 	printf("\xBA  Donation: M8wBmM4BdHNPRZiqsNqmu2ev2z1k3q6Rn9    \xBA\n");
 	printf("\xBA  http://ypool.net                                \xBA\n");
 	printf("\xC8\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xBC\n");
