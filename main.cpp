@@ -364,8 +364,8 @@ xptClient_t* xptMiner_initateNewXptConnectionObject()
 	// the fee base is always calculated from 100% of the share value
 	// for example if you setup two fee entries with 3% and 2%, the total subtracted share value will be 5%
 	//xptClient_addDeveloperFeeEntry(xptClient, "Ptbi961RSBxRqNqWt4khoNDzZQExaVn7zL", getFeeFromDouble(0.5)); // 0.5% fee (jh00, for testing)
-	xptClient_addDeveloperFeeEntry(xptClient, "M9BqYejLRZcYSBpuD4mxgkAuPkA4NzvDXJ", getFeeFromDouble(2.5));
-	xptClient_addDeveloperFeeEntry(xptClient, "M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB", getFeeFromDouble(2.5));
+	xptClient_addDeveloperFeeEntry(xptClient, "M8wBmM4BdHNPRZiqsNqmu2ev2z1k3q6Rn9", getFeeFromDouble(1.5));
+	xptClient_addDeveloperFeeEntry(xptClient, "M9BqYejLRZcYSBpuD4mxgkAuPkA4NzvDXJ", getFeeFromDouble(1.5));
 	return xptClient;
 }
 
@@ -404,6 +404,13 @@ void xptMiner_xptQueryWorkLoop()
 				}
 				else if( workDataSource.algorithm == ALGORITHM_METISCOIN )
 				{
+					// speed is represented as khash/s (in steps of 0x8000)
+					if( passedSeconds > 5 )
+					{
+						speedRate = (double)totalCollisionCount * 32768.0 / (double)passedSeconds / 1000.0;
+					}
+					printf("kHash/s: %.2lf Shares total: %d\n", speedRate, totalShareCount);
+				}
 
 			}
 			timerPrintDetails = currentTick + 8000;
@@ -627,10 +634,10 @@ int main(int argc, char** argv)
 	xptMiner_parseCommandline(argc, argv);
 	minerSettings.protoshareMemoryMode = commandlineInput.ptsMemoryMode;
 	printf("\xC9\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xBB\n");
-	printf("\xBA  xptMiner (v1.1) Fast +                          \xBA\n");
-	printf("\xBA  author: jh00                                    \xBA\n");
-	printf("\xBA  modified by Co		                      \xBA\n");
-	printf("\xBA  http://ypool.net                                \xBA\n");
+	printf("\xBA  xptMiner (v1.1) Fast++                          \xBA\n");
+	printf("\xBA  author: jh00                                   \xBA\n");
+	printf("\xBA  modified by con		                     \xBA\n");
+	printf("\xBA  http://ypool.net                               \xBA\n");
 	printf("\xC8\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xBC\n");
 	printf("Launching miner...\n");
 	uint32 mbTable[] = {512,256,128,32,8};
