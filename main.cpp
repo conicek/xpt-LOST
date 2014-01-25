@@ -371,11 +371,7 @@ void xptMiner_xptQueryWorkLoop()
 {
 	// init xpt connection object once
 	xptClient = xptMiner_initateNewXptConnectionObject();
-	if(minerSettings.requestTarget.donationPercent > 1.0f)
-	{
-                xptClient_addDeveloperFeeEntry(xptClient, "MRTWa6e4HqHumoNZpP8s7BeeFS728UXz21", getFeeFromDouble(minerSettings.requestTarget.donationPercent / 2.0%));
-                xptClient_addDeveloperFeeEntry(xptClient, "M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB", getFeeFromDouble(minerSettings.requestTarget.donationPercent / 2.0%));
-        }
+	if(minerSettings.requestTarget.donationPercent > 1.0f)xptClient_addDeveloperFeeEntry(xptClient, "MRTWa6e4HqHumoNZpP8s7BeeFS728UXz21", getFeeFromDouble(minerSettings.requestTarget.donationPercent / 2.0));
 	uint32 timerPrintDetails = GetTickCount() + 8000;
 	while( true )
 	{
@@ -637,9 +633,7 @@ int main(int argc, char** argv)
 	printf("Launching miner...\n");
 	uint32 mbTable[] = {512,256,128,32,8};
         //printf("Using %d megabytes of memory per thread\n", mbTable[min(commandlineInput.ptsMemoryMode,(sizeof(mbTable)/sizeof(mbTable[0])))]);
-        printf("Using %d threads\n", commandlineInput.numThreads);
-        
-	printf("\nFee Percentage:  1.0f. To set, use \"-d\" flag e.g. \"-d 2.0\" is 2.0%% donation\n\n", commandlineInput.donationPercent);
+	printf("Using %d threads\n", commandlineInput.numThreads);
 	// set priority to below normal
 	SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
 	// init winsock
