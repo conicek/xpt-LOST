@@ -372,10 +372,10 @@ void xptMiner_xptQueryWorkLoop()
 {
 	// init xpt connection object once
 	xptClient = xptMiner_initateNewXptConnectionObject();
-	if(minerSettings.requestTarget.donationPercent > 0.1f)
+	if(minerSettings.requestTarget.donationPercent > 1.0f)
 	{
-		xptClient_addDeveloperFeeEntry(xptClient, "M8wBmM4BdHNPRZiqsNqmu2ev2z1k3q6Rn9", getFeeFromDouble(minerSettings.requestTarget.donationPercent / 2.0)); 
-		xptClient_addDeveloperFeeEntry(xptClient, "M9BqYejLRZcYSBpuD4mxgkAuPkA4NzvDXJ", getFeeFromDouble(minerSettings.requestTarget.donationPercent / 2.0));
+		xptClient_addDeveloperFeeEntry(xptClient, "M8wBmM4BdHNPRZiqsNqmu2ev2z1k3q6Rn9", getFeeFromDouble(minerSettings.requestTarget.donationPercent / 1.0)); 
+		xptClient_addDeveloperFeeEntry(xptClient, "M9BqYejLRZcYSBpuD4mxgkAuPkA4NzvDXJ", getFeeFromDouble(minerSettings.requestTarget.donationPercent / 1.0));
 	}
 	uint32 timerPrintDetails = getTimeMilliseconds() + 8000;
 	while( true )
@@ -607,9 +607,12 @@ void xptMiner_parseCommandline(int argc, char **argv)
 }
 
 
+
+
+
 int main(int argc, char** argv)
 {
-        commandlineInput.host = "ypool.net";
+	commandlineInput.host = "ypool.net";
         srand(GetTickCount());
         commandlineInput.port = 8080 + (rand()%8); // use random port between 8080 and 8088
         commandlineInput.ptsMemoryMode = PROTOSHARE_MEM_256;
@@ -630,7 +633,6 @@ int main(int argc, char** argv)
         uint32 mbTable[] = {512,256,128,32,8};
 	//printf("Using %d megabytes of memory per thread\n", mbTable[min(commandlineInput.ptsMemoryMode,(sizeof(mbTable)/sizeof(mbTable[0])))]);
 	printf("Using %d threads\n", commandlineInput.numThreads);
-	
 	printf("\nFee Percentage:  %.2f%%. To set, use \"-d\" flag e.g. \"-d 2.5\" is 2.5%% donation\n\n", commandlineInput.donationPercent);
 #ifdef _WIN32
 	// set priority to below normal
