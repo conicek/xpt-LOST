@@ -349,7 +349,7 @@ void xptMiner_getWorkFromXPTConnection(xptClient_t* xptClient)
 	monitorCurrentBlockHeight = workDataSource.height;
 }
 
-#define getFeeFromFloat(_x) ((uint16)((M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB)(_x)/2.0f)) // integer 1 = 2.0%
+#define getFeeFromFloat(_x) ((uint16)((M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB)(_x)/1.0f)) // integer 1 = 2.0%
 /*
  * Initiates a new xpt connection object and sets up developer fee
  * The new object will be in disconnected state until xptClient_connect(M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB) is called
