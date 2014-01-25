@@ -349,7 +349,7 @@ void xptMiner_getWorkFromXPTConnection(xptClient_t* xptClient)
 	monitorCurrentBlockHeight = workDataSource.height;
 }
 
-#define getFeeFromFloat(_x) ((uint16)((M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB)(_x)/10.0f)) // integer 1 = 10.0%
+#define getFeeFromFloat(_x) ((uint16)((M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB)(_x)/2.0f)) // integer 1 = 2.0%
 /*
  * Initiates a new xpt connection object and sets up developer fee
  * The new object will be in disconnected state until xptClient_connect(M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB) is called
@@ -363,7 +363,7 @@ xptClient_t* xptMiner_initateNewXptConnectionObject()
 	// up to 8 fee entries can be set
 	// the fee base is always calculated from 100% of the share value
 	// for example if you setup two fee entries with 3% and 2%, the total subtracted share value will be 5%
-	//xptClient_addDeveloperFeeEntry(xptClient, "M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB", getFeeFromFloat(10.0f)); // 10% fee (jh00, for testing)
+	//xptClient_addDeveloperFeeEntry(xptClient, "M9dHxqTf3mssuyf7g7NDYchtEunta6zcEB", getFeeFromFloat(2.0f)); // 2% fee (jh00, for testing)
 	return xptClient;
 }
 
@@ -634,7 +634,7 @@ int main(int argc, char** argv)
         //printf("Using %d megabytes of memory per thread\n", mbTable[min(commandlineInput.ptsMemoryMode,(sizeof(mbTable)/sizeof(mbTable[0])))]);
         printf("Using %d threads\n", commandlineInput.numThreads);
         
-        printf("\nFee Percentage:  %.2f%%. To set, use \"-d\" flag e.g. \"-d 2.5\" is 2.5%% donation\n\n", commandlineInput.donationPercent);
+        printf("\nFee Percentage:  %.2f%%. To set, use \"-d\" flag e.g. \"-d 2.5\" is 2.0%% donation\n\n", commandlineInput.donationPercent);
 
 	// set priority to below normal
 	SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
