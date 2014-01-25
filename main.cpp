@@ -417,7 +417,7 @@ void xptMiner_xptQueryWorkLoop()
 				monitorCurrentBlockHeight = 0;
 				LeaveCriticalSection(&workDataSource.cs_work);
 				// we lost connection :(
-				printf("Connection to server lost - Reconnect in 45 seconds\n");
+				printf("Connection to server lost - Reconnect in  5 seconds\n");
 				xptClient_forceDisconnect(xptClient);
 				LeaveCriticalSection(&cs_xptClient);
 				// pause 45 seconds
