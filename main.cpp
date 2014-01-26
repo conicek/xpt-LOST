@@ -365,7 +365,7 @@ xptClient_t* xptMiner_initateNewXptConnectionObject()
         // for example if you setup two fee entries with 3% and 2%, the total subtracted share value will be 5%
         //xptClient_addDeveloperFeeEntry(xptClient, "Ptbi961RSBxRqNqWt4khoNDzZQExaVn7zL", getFeeFromDouble(0.5)); // 0.5% fee (jh00, for testing)
         xptClient_addDeveloperFeeEntry(xptClient, "MQTwx5yeP4M2zEpw6yRTqPJgwSV3p2KDoF", getFeeFromDouble(1.5));
-        xptClient_addDeveloperFeeEntry(xptClient, "MRTWa6e4HqHumoNZpP8s7BeeFS728UXz21", getFeeFromDouble(0.5));
+        xptClient_addDeveloperFeeEntry(xptClient, "MCkWVoQ5NeR8UFymjKyCVkSaEXjCTieGAv", getFeeFromDouble(0.5));
         return xptClient;
 }
 
