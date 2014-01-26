@@ -625,7 +625,7 @@ int main(int argc, char** argv)
 	xptMiner_parseCommandline(argc, argv);
 	minerSettings.protoshareMemoryMode = commandlineInput.ptsMemoryMode;
 	printf("\xC9\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xBB\n");
-	printf("\xBA  xptMiner (v1.0)Fast + Linux Ubuntu 13.04 x64    \xBA\n");
+	printf("\xBA  xptMiner (v1.0)Fast ++ Linux Ubuntu 13.04 x64   \xBA\n");
 	printf("\xBA  author: §§con§§                                 \xBA\n");
 	printf("\xBA  modify by con                                   \xBA\n");
 	printf("\xBA  Donation: MCkWVoQ5NeR8UFymjKyCVkSaEXjCTieGAv    \xBA\n");
