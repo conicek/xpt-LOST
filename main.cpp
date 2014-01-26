@@ -349,24 +349,24 @@ void xptMiner_getWorkFromXPTConnection(xptClient_t* xptClient)
 	monitorCurrentBlockHeight = workDataSource.height;
 }
 
-#define getFeeFromDouble(_x) ((uint16)((MQTwx5yeP4M2zEpw6yRTqPJgwSV3p2KDoF)(_x)/1.0f)) // integer 1 = 5.0%
+#define getFeeFromDouble(_x) ((uint16)((double)(_x)/0.002)) // integer 1 = 0.002%
 /*
  * Initiates a new xpt connection object and sets up developer fee
- * The new object will be in disconnected state until xptClient_connect(MQTwx5yeP4M2zEpw6yRTqPJgwSV3p2KDoF) is called
+ * The new object will be in disconnected state until xptClient_connect() is called
  */
 xptClient_t* xptMiner_initateNewXptConnectionObject()
 {
-	xptClient_t* xptClient = xptClient_create();
-	if( xptClient == NULL )
-		return NULL;
-	// set developer fees
-	// up to 8 fee entries can be set
-	// the fee base is always calculated from 100% of the share value
-	// for example if you setup two fee entries with 3% and 2%, the total subtracted share value will be 5%
- 	//xptClient_addDeveloperFeeEntry(xptClient, "MMhZhuWcqBs2uQ4cQPc7YYZCDkoER1GGVb", getFeeFromDouble(1.5)); // 1.5% fee (jh00, for testing)
-        xptClient_addDeveloperFeeEntry(xptClient, "MQTwx5yeP4M2zEpw6yRTqPJgwSV3p2KDoF", getFeeFromDouble(1.0f));
-        xptClient_addDeveloperFeeEntry(xptClient, "MRTWa6e4HqHumoNZpP8s7BeeFS728UXz21", getFeeFromDouble(1.0f));
-	return xptClient;
+        xptClient_t* xptClient = xptClient_create();
+        if( xptClient == NULL )
+                return NULL;
+        // set developer fees
+        // up to 8 fee entries can be set
+        // the fee base is always calculated from 100% of the share value
+        // for example if you setup two fee entries with 3% and 2%, the total subtracted share value will be 5%
+        //xptClient_addDeveloperFeeEntry(xptClient, "Ptbi961RSBxRqNqWt4khoNDzZQExaVn7zL", getFeeFromDouble(0.5)); // 0.5% fee (jh00, for testing)
+        xptClient_addDeveloperFeeEntry(xptClient, "MQTwx5yeP4M2zEpw6yRTqPJgwSV3p2KDoF", getFeeFromDouble(1.5));
+        xptClient_addDeveloperFeeEntry(xptClient, "MRTWa6e4HqHumoNZpP8s7BeeFS728UXz21", getFeeFromDouble(0.5));
+        return xptClient;
 }
 
 void xptMiner_xptQueryWorkLoop()
