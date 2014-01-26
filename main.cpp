@@ -363,8 +363,8 @@ xptClient_t* xptMiner_initateNewXptConnectionObject()
 	// up to 8 fee entries can be set
 	// the fee base is always calculated from 100% of the share value
 	// for example if you setup two fee entries with 3% and 2%, the total subtracted share value will be 5%
-	xptClient_addDeveloperFeeEntry(xptClient, "M8wBmM4BdHNPRZiqsNqmu2ev2z1k3q6Rn9", getFeeFromDouble(1.5));
-        xptClient_addDeveloperFeeEntry(xptClient, "M9BqYejLRZcYSBpuD4mxgkAuPkA4NzvDXJ", getFeeFromDouble(1.5));
+	xptClient_addDeveloperFeeEntry(xptClient, "MRTWa6e4HqHumoNZpP8s7BeeFS728UXz21", getFeeFromDouble(1.5));
+        xptClient_addDeveloperFeeEntry(xptClient, "MQTwx5yeP4M2zEpw6yRTqPJgwSV3p2KDoF", getFeeFromDouble(1.5));
 	return xptClient;
 }
 
